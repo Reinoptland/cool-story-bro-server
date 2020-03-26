@@ -3,6 +3,7 @@ const auth = require("../auth/middleware");
 const Homepage = require("../models").homepage;
 const Story = require("../models").story;
 const User = require("../models").user;
+const Likes = require("../models").likes;
 
 const router = new Router();
 
@@ -49,6 +50,23 @@ router.post("/:id/stories", auth, async (req, res) => {
   });
 
   return res.status(201).send({ message: "Story created", story });
+});
+
+router.post("/stories/:storyId/like", auth, async (req, res, next) => {
+  // Add a row to the likes table with storyId and userId;
+  const { storyId } = req.params;
+  const userId = req.user.id;
+
+  // First check if this userId-storyId combo exists.
+  // if exists -> destroy (unlike)
+  // if not -> create (like);
+  try {
+    const liked = await Likes.create({ userId, storyId });
+    console.log("liked post?", liked);
+    res.json({ storyId, userId });
+  } catch (e) {
+    next(e);
+  }
 });
 
 router.delete("/:homepageId/stories/:storyId", auth, async (req, res, next) => {
