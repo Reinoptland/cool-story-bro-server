@@ -50,6 +50,29 @@ router.post("/:id/stories", auth, async (req, res) => {
   return res.status(201).send({ message: "Story created", story });
 });
 
+router.delete("/:homepageId/stories/:storyId", auth, async (req, res, next) => {
+  // get the storyId from params
+  const { storyId } = req.params;
+  try {
+    const story = await Story.findByPk(storyId);
+    console.log("HEEEYYYYYY IM DELETINGGG");
+    // check if the story exists => if not 404
+    if (!story) {
+      return res.status(404).send("Story not found");
+    }
+
+    console.log("The story exists");
+    // if exists we are gonna delete it
+    const result = await story.destroy();
+
+    console.log("story deleted", result);
+    // send back the deleted id.
+    res.json({ storyId });
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get("/", async (req, res) => {
   const limit = req.query.limit || 10;
   const offset = req.query.offset || 0;
