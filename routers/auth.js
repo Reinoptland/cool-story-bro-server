@@ -91,7 +91,9 @@ router.post("/signup", async (req, res) => {
 router.get("/me", authMiddleware, async (req, res) => {
   const homepage = await Homepage.findOne({
     where: { userId: req.user.id },
-    include: [Story],
+    include: [
+      { model: Story, include: [{ model: User, attributes: ["id", "name"] }] }
+    ],
     order: [[Story, "createdAt", "DESC"]]
   });
   // don't send back the password hash

@@ -2,6 +2,7 @@ const { Router } = require("express");
 const auth = require("../auth/middleware");
 const Homepage = require("../models").homepage;
 const Story = require("../models").story;
+const User = require("../models").user;
 
 const router = new Router();
 
@@ -79,7 +80,9 @@ router.get("/", async (req, res) => {
   const homepages = await Homepage.findAndCountAll({
     limit,
     offset,
-    include: [Story],
+    include: [
+      { model: Story, include: [{ model: User, attributes: ["id", "name"] }] }
+    ],
     order: [[Story, "createdAt", "DESC"]]
   });
   res.status(200).send({ message: "ok", homepages });
@@ -94,7 +97,9 @@ router.get("/:id", async (req, res) => {
   }
 
   const homepage = await Homepage.findByPk(id, {
-    include: [Story],
+    include: [
+      { model: Story, include: [{ model: User, attributes: ["id", "name"] }] }
+    ],
     order: [[Story, "createdAt", "DESC"]]
   });
 
